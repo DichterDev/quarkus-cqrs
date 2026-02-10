@@ -1,0 +1,16 @@
+# VOLUMES
+/web/*
+/db/*
+
+# Quarkus
+.quarkus
+
+# IDE & OS
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+!*/.gitkeep
