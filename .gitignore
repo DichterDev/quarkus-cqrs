@@ -13,4 +13,7 @@
 .DS_Store
 Thumbs.db
 
+# ENV
+.env
+
 !*/.gitkeep
