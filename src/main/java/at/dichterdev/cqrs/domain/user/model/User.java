@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
 
-import at.dichterdev.cqrs.domain.common.DomainEvent;
 import at.dichterdev.cqrs.domain.common.Money;
 import at.dichterdev.cqrs.domain.user.event.UserCreditLimitUpdatedEvent;
 import at.dichterdev.cqrs.domain.user.event.UserEmailUpdatedEvent;
+import at.dichterdev.cqrs.domain.user.event.UserEvent;
 import at.dichterdev.cqrs.domain.user.event.UserFundsDepositedEvent;
 import at.dichterdev.cqrs.domain.user.event.UserFundsWithdrawnEvent;
 import at.dichterdev.cqrs.domain.user.event.UserNameUpdatedEvent;
@@ -35,7 +35,7 @@ public class User {
     private Money creditLimit = new Money(BigDecimal.valueOf(1000), Currency.getInstance("EUR"));
 
     @Builder.Default
-    private List<DomainEvent<UserId>> events = new ArrayList<>();
+    private List<UserEvent> events = new ArrayList<>();
 
     public static User register(String name, Email email) {
         User user = User.builder().id(UserId.generate()).name(name).email(email).build();

@@ -2,8 +2,9 @@ package at.dichterdev.cqrs.domain.common;
 
 import java.util.Collection;
 
-public interface DomainEventPublisher<ID> {
-    void publish(DomainEvent<ID> event);
+public interface DomainEventPublisher<E extends DomainEvent<?>> {
 
-    void publishAll(Collection<DomainEvent<ID>> events);
+    void publish(E event);
+
+    void publishAll(Collection<E> events);
 }
