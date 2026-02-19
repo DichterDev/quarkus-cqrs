@@ -1,0 +1,19 @@
+# Caddy
+# Postgres
+# PgAdmin
+
+networks:
+  cqrs:
+
+services:
+  web:
+    container_name: "cqrs-web"
+
+  db:
+    container_name: "cqrs-db"
+
+  pgadmin:
+    container_name: "cqrs-pgadmin"
+
+  prod:
+    container_name: "cqrs-prod"
