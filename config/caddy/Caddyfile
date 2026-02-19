@@ -1,6 +1,0 @@
-:80 {
-  reverse_proxy host.docker.internal:8080
-  handle_path /pgadmin* {
-    reverse_proxy oozy-pgadmin:80
-  }
-}
