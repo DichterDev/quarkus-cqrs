@@ -6,6 +6,7 @@ import at.dichterdev.cqrs.domain.transaction.model.Transaction;
 import at.dichterdev.cqrs.domain.transaction.port.TransactionEventPublisher;
 import at.dichterdev.cqrs.domain.transaction.port.TransactionRepository;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 
 public class TransactionCommandHandler implements CommandHandler<BeginTransactionCommand> {
 
@@ -16,6 +17,7 @@ public class TransactionCommandHandler implements CommandHandler<BeginTransactio
     private TransactionEventPublisher publisher;
 
     @Override
+    @Transactional
     public void handle(BeginTransactionCommand cmd) {
         var transaction = Transaction.begin(
                 cmd.senderId(),
