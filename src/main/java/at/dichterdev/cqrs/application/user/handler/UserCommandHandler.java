@@ -25,7 +25,7 @@ public class UserCommandHandler implements CommandHandler<RegisterUserCommand> {
 
         repository.save(user);
 
-        publisher.publishAll(user.getEvents());
+        publisher.publishAll(user.pullEvents());
     }
 
 }

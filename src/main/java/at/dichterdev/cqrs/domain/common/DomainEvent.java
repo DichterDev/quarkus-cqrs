@@ -3,10 +3,8 @@ package at.dichterdev.cqrs.domain.common;
 import java.time.Instant;
 import java.util.UUID;
 
-public interface DomainEvent<ID> {
+public interface DomainEvent {
     UUID id();
-
-    ID entityId();
 
     Instant occurredAt();
 }
