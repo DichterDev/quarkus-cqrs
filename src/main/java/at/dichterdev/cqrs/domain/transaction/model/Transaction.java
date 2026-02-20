@@ -6,12 +6,12 @@ import java.util.Currency;
 import java.util.List;
 import java.util.UUID;
 
+import at.dichterdev.cqrs.domain.common.DomainRoot;
 import at.dichterdev.cqrs.domain.common.Money;
 import at.dichterdev.cqrs.domain.transaction.event.TransactionAuthorizedEvent;
 import at.dichterdev.cqrs.domain.transaction.event.TransactionBeganEvent;
 import at.dichterdev.cqrs.domain.transaction.event.TransactionCancelledEvent;
 import at.dichterdev.cqrs.domain.transaction.event.TransactionCompletedEvent;
-import at.dichterdev.cqrs.domain.transaction.event.TransactionEvent;
 import at.dichterdev.cqrs.domain.transaction.event.TransactionFailedEvent;
 import at.dichterdev.cqrs.domain.user.model.UserId;
 import lombok.AccessLevel;
@@ -26,7 +26,7 @@ import static at.dichterdev.cqrs.domain.transaction.model.TransactionStatus.*;
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-public class Transaction {
+public class Transaction extends DomainRoot {
     private final TransactionId id;
 
     private final UserId senderId;
@@ -41,9 +41,6 @@ public class Transaction {
 
     @Builder.Default
     private TransactionStatus status = PENDING;
-
-    @Builder.Default
-    private List<TransactionEvent> events = new ArrayList<>();
 
     public static Transaction begin(
             UserId senderId,
@@ -83,12 +80,7 @@ public class Transaction {
 
         Transaction transaction = builder.build();
 
-        transaction.getEvents().add(new TransactionBeganEvent(
-                transaction.getId(),
-                transaction.getSenderId(),
-                transaction.getRecipientId(),
-                transaction.getAmount(),
-                transaction.getDescription()));
+        transaction.registerEvent(new TransactionBeganEvent(transaction));
 
         return transaction;
     }
@@ -100,12 +92,7 @@ public class Transaction {
 
         this.status = AUTHORIZED;
 
-        this.events.add(new TransactionAuthorizedEvent(
-                this.id,
-                this.senderId,
-                this.recipientId,
-                this.amount,
-                this.description));
+        this.registerEvent(new TransactionAuthorizedEvent(this));
     }
 
     public void complete() {
@@ -115,12 +102,7 @@ public class Transaction {
 
         this.status = COMPLETED;
 
-        this.events.add(new TransactionCompletedEvent(
-                this.id,
-                this.senderId,
-                this.recipientId,
-                this.amount,
-                this.description));
+        this.registerEvent(new TransactionCompletedEvent(this));
     }
 
     public void cancel() {
@@ -130,12 +112,7 @@ public class Transaction {
 
         this.status = CANCELLED;
 
-        this.events.add(new TransactionCancelledEvent(
-                this.id,
-                this.senderId,
-                this.recipientId,
-                this.amount,
-                this.description));
+        this.registerEvent(new TransactionCancelledEvent(this));
     }
 
     public void fail() {
@@ -145,11 +122,6 @@ public class Transaction {
 
         this.status = FAILED;
 
-        this.events.add(new TransactionFailedEvent(
-                this.id,
-                this.senderId,
-                this.recipientId,
-                this.amount,
-                this.description));
+        this.registerEvent(new TransactionFailedEvent(this));
     }
 }
