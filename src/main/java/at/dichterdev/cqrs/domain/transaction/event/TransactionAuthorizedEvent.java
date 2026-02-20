@@ -7,7 +7,7 @@ import at.dichterdev.cqrs.domain.common.Money;
 import at.dichterdev.cqrs.domain.transaction.model.TransactionId;
 import at.dichterdev.cqrs.domain.user.model.UserId;
 
-public record TransactionBeganEvent(
+public record TransactionAuthorizedEvent(
         UUID id,
         TransactionId entityId,
         UserId senderId,
@@ -16,7 +16,7 @@ public record TransactionBeganEvent(
         String description,
         Instant occurredAt) implements TransactionEvent {
 
-    public TransactionBeganEvent(
+    public TransactionAuthorizedEvent(
             TransactionId transactionId,
             UserId senderId,
             UserId recipientId,

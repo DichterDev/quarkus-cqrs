@@ -1,8 +1,16 @@
 package at.dichterdev.cqrs.domain.transaction.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import at.dichterdev.cqrs.domain.common.Money;
+import at.dichterdev.cqrs.domain.transaction.event.TransactionAuthorizedEvent;
+import at.dichterdev.cqrs.domain.transaction.event.TransactionBeganEvent;
+import at.dichterdev.cqrs.domain.transaction.event.TransactionCancelledEvent;
+import at.dichterdev.cqrs.domain.transaction.event.TransactionCompletedEvent;
+import at.dichterdev.cqrs.domain.transaction.event.TransactionEvent;
+import at.dichterdev.cqrs.domain.transaction.event.TransactionFailedEvent;
 import at.dichterdev.cqrs.domain.user.model.UserId;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -32,25 +40,99 @@ public class Transaction {
     @Builder.Default
     private TransactionStatus status = PENDING;
 
-    public static Transaction begin(UserId senderId, UserId recipientId, Money amount) {
-        return Transaction.builder().id(TransactionId.generate()).senderId(senderId).recipientId(recipientId)
-                .amount(amount).build();
+    @Builder.Default
+    private List<TransactionEvent> events = new ArrayList<>();
+
+    public static Transaction begin(
+            UserId senderId,
+            UserId recipientId,
+            Money amount) {
+        var transaction = Transaction.builder()
+                .id(TransactionId.generate())
+                .senderId(senderId)
+                .recipientId(recipientId)
+                .amount(amount)
+                .build();
+
+        transaction.getEvents().add(new TransactionBeganEvent(
+                transaction.getId(),
+                transaction.getSenderId(),
+                transaction.getRecipientId(),
+                transaction.getAmount(),
+                transaction.getDescription()));
+
+        return transaction;
     }
 
-    public static Transaction begin(UserId senderId, UserId recipientId, Money amount, String description) {
-        return Transaction.builder().id(TransactionId.generate()).senderId(senderId).recipientId(recipientId)
-                .amount(amount).description(description).build();
+    public static Transaction begin(
+            UserId senderId,
+            UserId recipientId,
+            Money amount,
+            String description) {
+        var transaction = Transaction.builder()
+                .id(TransactionId.generate())
+                .senderId(senderId)
+                .recipientId(recipientId)
+                .amount(amount)
+                .description(description)
+                .build();
+
+        transaction.getEvents().add(new TransactionBeganEvent(
+                transaction.getId(),
+                transaction.getSenderId(),
+                transaction.getRecipientId(),
+                transaction.getAmount(),
+                transaction.getDescription()));
+
+        return transaction;
     }
 
-    public static Transaction begin(UserId senderId, UserId recipientId, Money amount, TransactionType type) {
-        return Transaction.builder().id(TransactionId.generate()).senderId(senderId).recipientId(recipientId)
-                .amount(amount).type(type).build();
-    }
-
-    public static Transaction begin(UserId senderId, UserId recipientId, Money amount, String description,
+    public static Transaction begin(
+            UserId senderId,
+            UserId recipientId,
+            Money amount,
             TransactionType type) {
-        return Transaction.builder().id(TransactionId.generate()).senderId(senderId).recipientId(recipientId)
-                .amount(amount).description(description).type(type).build();
+        var transaction = Transaction.builder()
+                .id(TransactionId.generate())
+                .senderId(senderId)
+                .recipientId(recipientId)
+                .amount(amount)
+                .type(type)
+                .build();
+
+        transaction.getEvents().add(new TransactionBeganEvent(
+                transaction.getId(),
+                transaction.getSenderId(),
+                transaction.getRecipientId(),
+                transaction.getAmount(),
+                transaction.getDescription()));
+
+        return transaction;
+    }
+
+    public static Transaction begin(
+            UserId senderId,
+            UserId recipientId,
+            Money amount,
+            String description,
+            TransactionType type) {
+        var transaction = Transaction.builder()
+                .id(TransactionId.generate())
+                .senderId(senderId)
+                .recipientId(recipientId)
+                .amount(amount)
+                .description(description)
+                .type(type)
+                .build();
+
+        transaction.getEvents().add(new TransactionBeganEvent(
+                transaction.getId(),
+                transaction.getSenderId(),
+                transaction.getRecipientId(),
+                transaction.getAmount(),
+                transaction.getDescription()));
+
+        return transaction;
     }
 
     public void authorize() {
@@ -59,6 +141,13 @@ public class Transaction {
         }
 
         this.status = AUTHORIZED;
+
+        this.events.add(new TransactionAuthorizedEvent(
+                this.id,
+                this.senderId,
+                this.recipientId,
+                this.amount,
+                this.description));
     }
 
     public void complete() {
@@ -67,6 +156,13 @@ public class Transaction {
         }
 
         this.status = COMPLETED;
+
+        this.events.add(new TransactionCompletedEvent(
+                this.id,
+                this.senderId,
+                this.recipientId,
+                this.amount,
+                this.description));
     }
 
     public void cancel() {
@@ -75,6 +171,13 @@ public class Transaction {
         }
 
         this.status = CANCELLED;
+
+        this.events.add(new TransactionCancelledEvent(
+                this.id,
+                this.senderId,
+                this.recipientId,
+                this.amount,
+                this.description));
     }
 
     public void fail() {
@@ -83,5 +186,12 @@ public class Transaction {
         }
 
         this.status = FAILED;
+
+        this.events.add(new TransactionFailedEvent(
+                this.id,
+                this.senderId,
+                this.recipientId,
+                this.amount,
+                this.description));
     }
 }
