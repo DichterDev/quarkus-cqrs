@@ -1,6 +1,8 @@
 package at.dichterdev.cqrs.domain.transaction.model;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,84 +48,40 @@ public class Transaction {
     public static Transaction begin(
             UserId senderId,
             UserId recipientId,
-            Money amount) {
-        var transaction = Transaction.builder()
-                .id(TransactionId.generate())
-                .senderId(senderId)
-                .recipientId(recipientId)
-                .amount(amount)
-                .build();
-
-        transaction.getEvents().add(new TransactionBeganEvent(
-                transaction.getId(),
-                transaction.getSenderId(),
-                transaction.getRecipientId(),
-                transaction.getAmount(),
-                transaction.getDescription()));
-
-        return transaction;
-    }
-
-    public static Transaction begin(
-            UserId senderId,
-            UserId recipientId,
-            Money amount,
-            String description) {
-        var transaction = Transaction.builder()
-                .id(TransactionId.generate())
-                .senderId(senderId)
-                .recipientId(recipientId)
-                .amount(amount)
-                .description(description)
-                .build();
-
-        transaction.getEvents().add(new TransactionBeganEvent(
-                transaction.getId(),
-                transaction.getSenderId(),
-                transaction.getRecipientId(),
-                transaction.getAmount(),
-                transaction.getDescription()));
-
-        return transaction;
-    }
-
-    public static Transaction begin(
-            UserId senderId,
-            UserId recipientId,
-            Money amount,
-            TransactionType type) {
-        var transaction = Transaction.builder()
-                .id(TransactionId.generate())
-                .senderId(senderId)
-                .recipientId(recipientId)
-                .amount(amount)
-                .type(type)
-                .build();
-
-        transaction.getEvents().add(new TransactionBeganEvent(
-                transaction.getId(),
-                transaction.getSenderId(),
-                transaction.getRecipientId(),
-                transaction.getAmount(),
-                transaction.getDescription()));
-
-        return transaction;
-    }
-
-    public static Transaction begin(
-            UserId senderId,
-            UserId recipientId,
             Money amount,
             String description,
             TransactionType type) {
-        var transaction = Transaction.builder()
+        if (senderId == null) {
+            throw new IllegalArgumentException("Transaction Sender ID cannot be null!");
+        }
+
+        if (recipientId == null) {
+            throw new IllegalArgumentException("Transaction Recipient ID cannot be null!");
+        }
+
+        if (amount == null) {
+            throw new IllegalArgumentException("Transaction Amount cannot be null!");
+        }
+
+        if (!amount.isGreaterOrEqual(new Money(BigDecimal.ZERO, Currency.getInstance("EUR")))) {
+            throw new IllegalArgumentException("Transaction Amount cannot be negative!");
+        }
+
+        var builder = Transaction.builder()
                 .id(TransactionId.generate())
                 .senderId(senderId)
                 .recipientId(recipientId)
-                .amount(amount)
-                .description(description)
-                .type(type)
-                .build();
+                .amount(amount);
+
+        if (description != null) {
+            builder.description(description);
+        }
+
+        if (type != null) {
+            builder.type(type);
+        }
+
+        Transaction transaction = builder.build();
 
         transaction.getEvents().add(new TransactionBeganEvent(
                 transaction.getId(),
