@@ -21,11 +21,10 @@ public class UserCommandHandler implements CommandHandler<RegisterUserCommand> {
     @Override
     @Transactional
     public void handle(RegisterUserCommand cmd) {
-        User user = User.register(cmd.name(), new Email(cmd.name()));
+        User user = User.register(cmd.name(), new Email(cmd.email()));
 
         repository.save(user);
 
         publisher.publishAll(user.pullEvents());
     }
-
 }

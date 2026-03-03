@@ -67,7 +67,7 @@ public class User extends DomainRoot {
             String old = this.name;
             this.name = name;
 
-            this.registerEvent(new UserNameUpdatedEvent(this, name));
+            this.registerEvent(new UserNameUpdatedEvent(this, old));
         }
 
         if (email != null) {
